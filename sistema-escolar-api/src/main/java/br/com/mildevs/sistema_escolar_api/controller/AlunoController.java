@@ -68,7 +68,7 @@ public class AlunoController {
             aluno.setNome(dto.getNome());
             aluno.setSerie(dto.getSerie());
             aluno.setDataNascimento(dto.getDataNascimento());
-            return ResponseEntity.ok(toRespondeDTO(aluno));
+            return ResponseEntity.ok(toRespondeDTO(alunoRepository.save(aluno)));
 
         } else {
             return ResponseEntity.notFound().build();

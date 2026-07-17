@@ -1,38 +1,27 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import AlunoForm from './AlunoForm';
+import AlunoForm from './components/AlunoForm';
+import { Link, Route, Routes } from 'react-router-dom';
+import AlunosPages from './pages/AlunosPage';
+import ProfessoresPages from './pages/ProfessoresPage';
 
 function App() {
-  const [alunos, setAlunos] = useState([]);
-
-  function carregarAlunos() {
-    axios.get('http://localhost:8080/alunos')
-      .then(response => setAlunos(response.data))
-      .catch(error => console.error('Erro ao buscar alunos:', error));
-  }
-
-  useEffect(() => {
-    carregarAlunos();
-  }, []);
-
-  function handleAlunoCriado(novoAluno) {
-    setAlunos([...alunos, novoAluno]); // adiciona o novo aluno na lista, sem precisar recarregar tudo
-  }
 
   return (
     <div>
-      <h1>Alunos cadastrados</h1>
-      <ul>
-        {alunos.map(aluno => (
-          <li key={aluno.matricula}>
-            {aluno.nome} — {aluno.serie}
-          </li>
-        ))}
-      </ul>
+      <Link to="/alunos">Alunos</Link>
+      <Link to="/professores">Professores</Link>
+      {/* <Link to="/turmas">Turmas</Link>
+      <Link to="/salas">Salas</Link> */}
 
-      <AlunoForm onAlunoCriado={handleAlunoCriado} />
+      <Routes>
+        <Route path='/alunos' element={<AlunosPages />}></Route>
+        <Route path='/professores' element={<ProfessoresPages />}></Route>
+      </Routes>
+
+      
     </div>
   );
 }
 
-export default App;
+export default App; 
