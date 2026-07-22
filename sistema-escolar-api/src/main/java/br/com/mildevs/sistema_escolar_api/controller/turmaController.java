@@ -6,6 +6,7 @@ import br.com.mildevs.sistema_escolar_api.DTO.Turma.TurmaRequestDTO;
 import br.com.mildevs.sistema_escolar_api.DTO.Turma.TurmaResponseDTO;
 import br.com.mildevs.sistema_escolar_api.repository.TurmaRepository;
 import br.com.mildevs.sistema_escolar_api.repository.ProfessorRepository;
+import org.antlr.v4.runtime.atn.ProfilingATNSimulator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import br.com.mildevs.sistema_escolar_api.entity.Professor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -90,14 +92,32 @@ public class turmaController {
     }
 
     @PutMapping("/{cod}")
-    public ResponseEntity<TurmaResponseDTO> atualizar_nome(@PathVariable Integer cod, @RequestBody TurmaResponseDTO turmaAtualizado) {
+    public ResponseEntity<TurmaResponseDTO> atualizarTurma(@PathVariable Integer cod, @RequestBody TurmaRequestDTO  turmaAtualizada) {
+        Turma turma = turmaRepository.findById(cod).orElse(null);
+        Professor professor = professorRepository.findById(turmaAtualizada.getCodProfessor()).orElse(null);
+
+        if (turma == null || professor == null)
+            return ResponseEntity.notFound().build();
+
         return turmaRepository.findById(cod)
-                .map(turma -> {
-                    turma.setNome(turmaAtualizado.getNome());
-                    return ResponseEntity.ok(toResponseDTO(turmaRepository.save(turma)));
-                })
-                .orElse(ResponseEntity.notFound().build());
+                .map(t -> {
+                    t.setNome(turmaAtualizada.getNome());
+                    t.setProfessor(professor);
+                    Turma atualizada = turmaRepository.save(turma);
+                    return ResponseEntity.ok(toResponseDTO(atualizada));
+                }).orElse(ResponseEntity.notFound().build());
+
     }
+
+//    @PutMapping("/{cod}")
+//    public ResponseEntity<TurmaResponseDTO> atualizar_nome(@PathVariable Integer cod, @RequestBody TurmaResponseDTO turmaAtualizado) {
+//        return turmaRepository.findById(cod)
+//                .map(turma -> {
+//                    turma.setNome(turmaAtualizado.getNome());
+//                    return ResponseEntity.ok(toResponseDTO(turmaRepository.save(turma)));
+//                })
+//                .orElse(ResponseEntity.notFound().build());
+//    }
 
     @DeleteMapping("/{cod}")
     public ResponseEntity<Void> deletar(@PathVariable Integer cod) {
